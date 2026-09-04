@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  createUserProfile,
+  type QuizAnswers,
+} from "@/domain/match/createUserProfile";
+import type { UserProfile } from "@/domain/match/types";
 
 type Question = {
   id: number;
@@ -138,7 +143,8 @@ const resultProducts: ResultProduct[] = [
 
 export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string[]>>({});
+  const [answers, setAnswers] = useState<QuizAnswers>({});
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showResults, setShowResults] = useState(false);
 
   const question = questions[currentQuestion];
@@ -190,7 +196,13 @@ export default function QuizPage() {
     }
 
     if (isLastQuestion) {
+      const profile = createUserProfile(answers);
+
+      setUserProfile(profile);
       setShowResults(true);
+
+      console.log("UserProfile:", profile);
+
       return;
     }
 
@@ -206,6 +218,7 @@ export default function QuizPage() {
   const handleRestart = () => {
     setCurrentQuestion(0);
     setAnswers({});
+    setUserProfile(null);
     setShowResults(false);
   };
 
@@ -227,6 +240,22 @@ export default function QuizPage() {
               compatíveis com as necessidades que você contou.
             </p>
           </div>
+
+          {userProfile && (
+            <div className="mx-auto mt-8 max-w-2xl rounded-2xl bg-white p-4 text-left text-sm text-zinc-600 shadow-sm ring-1 ring-zinc-100">
+              <p className="font-semibold text-zinc-900">
+                Perfil identificado
+              </p>
+
+              <p className="mt-2">
+                Tipo de cabelo: {userProfile.hairPattern}
+              </p>
+
+              <p>
+                Estratégia: {userProfile.recommendationStrategy}
+              </p>
+            </div>
+          )}
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {resultProducts.map((product) => (
