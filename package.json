@@ -2,12 +2,13 @@
   "name": "match-capilar",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint",
+  "docker:dev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true; docker compose up"
+},
   "dependencies": {
     "next": "16.3.4",
     "react": "19.2.8",
