@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  mapBudget,
   mapCareRoutine,
   mapChemicalTreatment,
   mapHairCondition,
@@ -135,6 +136,26 @@ describe("mapHairPattern", () => {
   });
 });
 
+describe("mapBudget", () => {
+  it("deve mapear orçamento de até 30 reais", () => {
+    expect(mapBudget("Até R$ 30")).toEqual({
+      maxAmount: 30,
+    });
+  });
+
+  it("deve mapear orçamento de até 80 reais", () => {
+    expect(mapBudget("R$ 51 a R$ 80")).toEqual({
+      maxAmount: 80,
+    });
+  });
+
+  it("deve considerar orçamento sem limite quando o usuário não informar", () => {
+    expect(mapBudget("Não quero informar")).toEqual({
+      maxAmount: Number.POSITIVE_INFINITY,
+    });
+  });
+});
+
 describe("createUserProfile", () => {
   it("deve criar um perfil completo com necessidades específicas", () => {
     const answers: QuizAnswers = {
@@ -147,6 +168,7 @@ describe("createUserProfile", () => {
       ],
       6: ["2 a 3 vezes por semana"],
       7: ["Cacheado"],
+      8: ["R$ 51 a R$ 80"],
     };
 
     expect(createUserProfile(answers)).toEqual({
@@ -157,6 +179,9 @@ describe("createUserProfile", () => {
       heatExposure: "frequentemente",
       careRoutine: "rotina_moderada",
       washFrequency: "duas_a_tres_semana",
+      budget: {
+        maxAmount: 80,
+      },
       recommendationStrategy: "necessidades_especificas",
     });
   });
@@ -170,6 +195,7 @@ describe("createUserProfile", () => {
       5: ["Não tenho uma rotina definida"],
       6: ["Varia bastante"],
       7: ["Cacheado"],
+      8: ["Não quero informar"],
     };
 
     expect(createUserProfile(answers)).toEqual({
@@ -180,6 +206,9 @@ describe("createUserProfile", () => {
       heatExposure: "nao_usa",
       careRoutine: "rotina_indefinida",
       washFrequency: "variavel",
+      budget: {
+        maxAmount: Number.POSITIVE_INFINITY,
+      },
       recommendationStrategy: "cuidado_amplo",
     });
   });
@@ -189,6 +218,7 @@ describe("createUserProfile", () => {
       1: ["Com frizz e desalinhados"],
       2: ["Frizz", "Definição"],
       7: ["Ondulado"],
+      8: ["Até R$ 30"],
     };
 
     const profile = createUserProfile(answers);
@@ -201,6 +231,8 @@ describe("createUserProfile", () => {
     ]);
 
     expect(profile.hairPattern).toBe("ondulado");
+
+    expect(profile.budget.maxAmount).toBe(30);
 
     expect(profile.recommendationStrategy).toBe(
       "necessidades_especificas",

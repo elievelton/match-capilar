@@ -115,6 +115,21 @@ const questions: Question[] = [
       "Não sei dizer",
     ],
   },
+  {
+  id: 8,
+  title: "Quanto você pretende gastar em um produto para o seu cabelo?",
+  description:
+    "Isso nos ajuda a encontrar opções que façam sentido para você.",
+  options: [
+    "Até R$ 30",
+    "R$ 31 a R$ 50",
+    "R$ 51 a R$ 80",
+    "R$ 81 a R$ 120",
+    "R$ 121 a R$ 200",
+    "Mais de R$ 200",
+    "Não quero informar",
+  ],
+},
 ];
 
 const resultProducts: ResultProduct[] = [

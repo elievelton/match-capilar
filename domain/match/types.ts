@@ -60,20 +60,18 @@ export type RecommendationStrategy =
   | "necessidades_especificas"
   | "cuidado_amplo";
 
+export type Budget = {
+  maxAmount: number;
+};
+
 export type UserProfile = {
   hairPattern: HairPattern;
-
   hairConditions: HairCondition[];
-
   goals: HairGoal[];
-
   chemicalTreatment: ChemicalTreatment;
-
   heatExposure: HeatExposure;
-
   careRoutine: CareRoutine;
-
   washFrequency: WashFrequency;
-
+  budget: Budget;
   recommendationStrategy: RecommendationStrategy;
 };

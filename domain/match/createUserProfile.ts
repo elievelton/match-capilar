@@ -1,5 +1,6 @@
 import type { UserProfile } from "./types";
 import {
+  mapBudget,
   mapCareRoutine,
   mapChemicalTreatment,
   mapHairCondition,
@@ -21,6 +22,7 @@ export function createUserProfile(
   const careRoutineAnswer = answers[5]?.[0] ?? "";
   const washFrequencyAnswer = answers[6]?.[0] ?? "";
   const hairPatternAnswer = answers[7]?.[0] ?? "";
+  const budgetAnswer = answers[8]?.[0] ?? "";
 
   const hairConditions = [
     mapHairCondition(hairConditionAnswer),
@@ -42,6 +44,7 @@ export function createUserProfile(
     heatExposure: mapHeatExposure(heatExposureAnswer),
     careRoutine: mapCareRoutine(careRoutineAnswer),
     washFrequency: mapWashFrequency(washFrequencyAnswer),
+    budget: mapBudget(budgetAnswer),
     recommendationStrategy: hasSpecificNeeds
       ? "necessidades_especificas"
       : "cuidado_amplo",

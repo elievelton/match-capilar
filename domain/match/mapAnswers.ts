@@ -1,4 +1,5 @@
 import type {
+  Budget,
   CareRoutine,
   ChemicalTreatment,
   HairCondition,
@@ -175,5 +176,33 @@ export function mapHairPattern(answer: string): HairPattern {
 
     default:
       return "tipo_nao_informado";
+  }
+}
+
+export function mapBudget(answer: string): Budget {
+  switch (answer) {
+    case "Até R$ 30":
+      return { maxAmount: 30 };
+
+    case "R$ 31 a R$ 50":
+      return { maxAmount: 50 };
+
+    case "R$ 51 a R$ 80":
+      return { maxAmount: 80 };
+
+    case "R$ 81 a R$ 120":
+      return { maxAmount: 120 };
+
+    case "R$ 121 a R$ 200":
+      return { maxAmount: 200 };
+
+    case "Mais de R$ 200":
+      return { maxAmount: Number.POSITIVE_INFINITY };
+
+    case "Não quero informar":
+      return { maxAmount: Number.POSITIVE_INFINITY };
+
+    default:
+      return { maxAmount: Number.POSITIVE_INFINITY };
   }
 }
