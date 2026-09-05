@@ -1,3 +1,4 @@
+import Link from "next/link";
 import HowItWorks from "@/components/HowItWorks";
 
 export default function Home() {
@@ -24,12 +25,12 @@ export default function Home() {
               </p>
 
               <div className="mt-8">
-                <button
-                  type="button"
-                  className="rounded-full bg-pink-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-pink-200 transition hover:bg-pink-700 hover:shadow-xl"
+                <Link
+                  href="/quiz"
+                  className="inline-flex rounded-full bg-pink-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-pink-200 transition hover:bg-pink-700 hover:shadow-xl"
                 >
                   Começar meu Match
-                </button>
+                </Link>
               </div>
 
               <p className="mt-4 text-sm text-zinc-500">

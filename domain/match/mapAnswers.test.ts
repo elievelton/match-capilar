@@ -139,19 +139,27 @@ describe("mapHairPattern", () => {
 describe("mapBudget", () => {
   it("deve mapear orçamento de até 30 reais", () => {
     expect(mapBudget("Até R$ 30")).toEqual({
+      mode: "limited",
       maxAmount: 30,
     });
   });
 
   it("deve mapear orçamento de até 80 reais", () => {
     expect(mapBudget("R$ 51 a R$ 80")).toEqual({
+      mode: "limited",
       maxAmount: 80,
     });
   });
 
-  it("deve considerar orçamento sem limite quando o usuário não informar", () => {
-    expect(mapBudget("Não quero informar")).toEqual({
-      maxAmount: Number.POSITIVE_INFINITY,
+  it("deve considerar orçamento sem limite quando o usuário não quiser limitar pelo preço", () => {
+    expect(mapBudget("Não quero limitar pelo preço")).toEqual({
+      mode: "unlimited",
+    });
+  });
+
+  it("deve preservar o orçamento quando o usuário preferir não informar", () => {
+    expect(mapBudget("Prefiro não informar")).toEqual({
+      mode: "not_informed",
     });
   });
 });
@@ -180,6 +188,7 @@ describe("createUserProfile", () => {
       careRoutine: "rotina_moderada",
       washFrequency: "duas_a_tres_semana",
       budget: {
+        mode: "limited",
         maxAmount: 80,
       },
       recommendationStrategy: "necessidades_especificas",
@@ -195,7 +204,7 @@ describe("createUserProfile", () => {
       5: ["Não tenho uma rotina definida"],
       6: ["Varia bastante"],
       7: ["Cacheado"],
-      8: ["Não quero informar"],
+      8: ["Prefiro não informar"],
     };
 
     expect(createUserProfile(answers)).toEqual({
@@ -207,7 +216,7 @@ describe("createUserProfile", () => {
       careRoutine: "rotina_indefinida",
       washFrequency: "variavel",
       budget: {
-        maxAmount: Number.POSITIVE_INFINITY,
+        mode: "not_informed",
       },
       recommendationStrategy: "cuidado_amplo",
     });
@@ -232,7 +241,10 @@ describe("createUserProfile", () => {
 
     expect(profile.hairPattern).toBe("ondulado");
 
-    expect(profile.budget.maxAmount).toBe(30);
+    expect(profile.budget).toEqual({
+      mode: "limited",
+      maxAmount: 30,
+    });
 
     expect(profile.recommendationStrategy).toBe(
       "necessidades_especificas",

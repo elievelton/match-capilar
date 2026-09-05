@@ -21,15 +21,8 @@ export type HairPattern =
   | "crespo"
   | "multiplos_padroes";
 
-export type ProductIntensity =
-  | "leve"
-  | "media"
-  | "intensa";
-
-export type RoutineComplexity =
-  | "simples"
-  | "moderada"
-  | "complexa";
+export type ProductIntensity = "leve" | "media" | "intensa";
+export type RoutineComplexity = "simples" | "moderada" | "complexa";
 
 export type ProductNeeds = {
   hydration: MatchLevel;
@@ -52,9 +45,24 @@ export type ProductCharacteristics = {
 };
 
 export type ProductProfile = {
+  /**
+   * Metadados opcionais para enriquecer
+   * o catálogo real sem quebrar os testes
+   * unitários existentes do domínio.
+   */
+  id?: string;
   name: string;
   brand: string;
   category: ProductCategory;
+  imageUrl?: string;
+  sourceUrl?: string;
+
+  /**
+   * Dados de reputação externa do produto.
+   */
+  rating?: number;
+  reviewCount?: number;
+
   needs: ProductNeeds;
   compatibility: ProductCompatibility;
   characteristics: ProductCharacteristics;

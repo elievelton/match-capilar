@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   createUserProfile,
   type QuizAnswers,
 } from "@/domain/match/createUserProfile";
-import type { UserProfile } from "@/domain/match/types";
 
 type Question = {
   id: number;
@@ -14,13 +14,6 @@ type Question = {
   multiple?: boolean;
   maxSelections?: number;
   options: string[];
-};
-
-type ResultProduct = {
-  name: string;
-  match: number;
-  description: string;
-  reason: string;
 };
 
 const questions: Question[] = [
@@ -132,35 +125,10 @@ const questions: Question[] = [
 },
 ];
 
-const resultProducts: ResultProduct[] = [
-  {
-    name: "Máscara Hidra Match",
-    match: 94,
-    description:
-      "Tratamento focado em hidratação e maciez para fios que precisam recuperar o toque saudável.",
-    reason: "Combina com as necessidades de hidratação e cuidado dos seus fios.",
-  },
-  {
-    name: "Leave-in Controle Match",
-    match: 89,
-    description:
-      "Finalizador pensado para ajudar no controle do frizz e deixar os fios mais alinhados.",
-    reason: "Pode fazer sentido para uma rotina que busca mais controle e praticidade.",
-  },
-  {
-    name: "Tratamento Repair Match",
-    match: 84,
-    description:
-      "Tratamento desenvolvido para uma rotina de cuidado voltada a fios fragilizados.",
-    reason: "É uma opção compatível com necessidades de recuperação e fortalecimento.",
-  },
-];
-
 export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const router = useRouter();
   const [answers, setAnswers] = useState<QuizAnswers>({});
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [showResults, setShowResults] = useState(false);
 
   const question = questions[currentQuestion];
   const selectedOptions = answers[question.id] ?? [];
@@ -213,10 +181,12 @@ export default function QuizPage() {
     if (isLastQuestion) {
       const profile = createUserProfile(answers);
 
-      setUserProfile(profile);
-      setShowResults(true);
+      sessionStorage.setItem(
+        "match-capilar:user-profile",
+        JSON.stringify(profile),
+      );
 
-      console.log("UserProfile:", profile);
+      router.push("/resultado");
 
       return;
     }
@@ -233,104 +203,7 @@ export default function QuizPage() {
   const handleRestart = () => {
     setCurrentQuestion(0);
     setAnswers({});
-    setUserProfile(null);
-    setShowResults(false);
   };
-
-  if (showResults) {
-    return (
-      <main className="min-h-screen bg-zinc-50 text-zinc-900">
-        <section className="mx-auto max-w-5xl px-6 py-12 sm:px-10 sm:py-16">
-          <div className="text-center">
-            <span className="text-sm font-medium uppercase tracking-[0.2em] text-pink-600">
-              Seu resultado
-            </span>
-
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-5xl">
-              Encontramos produtos que combinam com você.
-            </h1>
-
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-zinc-600">
-              Com base nas suas respostas, encontramos algumas opções
-              compatíveis com as necessidades que você contou.
-            </p>
-          </div>
-
-          {userProfile && (
-            <div className="mx-auto mt-8 max-w-2xl rounded-2xl bg-white p-4 text-left text-sm text-zinc-600 shadow-sm ring-1 ring-zinc-100">
-              <p className="font-semibold text-zinc-900">
-                Perfil identificado
-              </p>
-
-              <p className="mt-2">
-                Tipo de cabelo: {userProfile.hairPattern}
-              </p>
-
-              <p>
-                Estratégia: {userProfile.recommendationStrategy}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {resultProducts.map((product) => (
-              <article
-                key={product.name}
-                className="flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-100"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="rounded-full bg-pink-50 px-3 py-1 text-sm font-semibold text-pink-700">
-                    {product.match}% Match
-                  </span>
-                </div>
-
-                <div className="mt-8 flex aspect-square items-center justify-center rounded-2xl bg-gradient-to-br from-pink-50 via-white to-rose-50">
-                  <div className="flex h-28 w-28 items-center justify-center rounded-full bg-pink-100 text-4xl">
-                    ♡
-                  </div>
-                </div>
-
-                <h2 className="mt-6 text-xl font-semibold text-zinc-950">
-                  {product.name}
-                </h2>
-
-                <p className="mt-3 text-sm leading-6 text-zinc-600">
-                  {product.description}
-                </p>
-
-                <div className="mt-5 rounded-2xl bg-zinc-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                    Por que apareceu?
-                  </p>
-
-                  <p className="mt-2 text-sm leading-6 text-zinc-700">
-                    {product.reason}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-6 rounded-full border border-zinc-200 px-5 py-3 text-sm font-semibold text-zinc-800 transition hover:border-pink-300 hover:bg-pink-50"
-                >
-                  Conhecer produto
-                </button>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <button
-              type="button"
-              onClick={handleRestart}
-              className="rounded-full px-6 py-3 text-sm font-semibold text-zinc-600 transition hover:bg-white hover:text-zinc-900"
-            >
-              Refazer meu Match
-            </button>
-          </div>
-        </section>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-white text-zinc-900">

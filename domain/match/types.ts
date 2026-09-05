@@ -60,9 +60,17 @@ export type RecommendationStrategy =
   | "necessidades_especificas"
   | "cuidado_amplo";
 
-export type Budget = {
-  maxAmount: number;
-};
+export type Budget =
+  | {
+      mode: "limited";
+      maxAmount: number;
+    }
+  | {
+      mode: "unlimited";
+    }
+  | {
+      mode: "not_informed";
+    };
 
 export type UserProfile = {
   hairPattern: HairPattern;

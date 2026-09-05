@@ -182,27 +182,48 @@ export function mapHairPattern(answer: string): HairPattern {
 export function mapBudget(answer: string): Budget {
   switch (answer) {
     case "Até R$ 30":
-      return { maxAmount: 30 };
+      return {
+        mode: "limited",
+        maxAmount: 30,
+      };
 
     case "R$ 31 a R$ 50":
-      return { maxAmount: 50 };
+      return {
+        mode: "limited",
+        maxAmount: 50,
+      };
 
     case "R$ 51 a R$ 80":
-      return { maxAmount: 80 };
+      return {
+        mode: "limited",
+        maxAmount: 80,
+      };
 
     case "R$ 81 a R$ 120":
-      return { maxAmount: 120 };
+      return {
+        mode: "limited",
+        maxAmount: 120,
+      };
 
     case "R$ 121 a R$ 200":
-      return { maxAmount: 200 };
+      return {
+        mode: "limited",
+        maxAmount: 200,
+      };
 
-    case "Mais de R$ 200":
-      return { maxAmount: Number.POSITIVE_INFINITY };
+    case "Não quero limitar pelo preço":
+      return {
+        mode: "unlimited",
+      };
 
-    case "Não quero informar":
-      return { maxAmount: Number.POSITIVE_INFINITY };
+    case "Prefiro não informar":
+      return {
+        mode: "not_informed",
+      };
 
     default:
-      return { maxAmount: Number.POSITIVE_INFINITY };
+      return {
+        mode: "not_informed",
+      };
   }
 }
