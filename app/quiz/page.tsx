@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   createUserProfile,
@@ -133,10 +133,19 @@ const questions: Question[] = [
   },
 ];
 
+const analysisSteps = [
+  "Analisando o que seu cabelo precisa...",
+  "Cruzando suas necessidades com os produtos...",
+  "Encontrando os produtos que mais combinam com você...",
+  "Seu Match está quase pronto...",
+];
+
 export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const router = useRouter();
   const [answers, setAnswers] = useState<QuizAnswers>({});
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
 
   const question = questions[currentQuestion];
   const selectedOptions = answers[question.id] ?? [];
@@ -144,6 +153,34 @@ export default function QuizPage() {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
   const hasAnswer = selectedOptions.length > 0;
   const isLastQuestion = currentQuestion === questions.length - 1;
+
+  useEffect(() => {
+    if (!isAnalyzing) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setAnalysisStep((current) =>
+        Math.min(current + 1, analysisSteps.length - 1),
+      );
+    }, 1000);
+
+    const timeout = window.setTimeout(() => {
+      const profile = createUserProfile(answers);
+
+      sessionStorage.setItem(
+        "match-capilar:user-profile",
+        JSON.stringify(profile),
+      );
+
+      router.push("/resultado");
+    }, 4000);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [isAnalyzing, answers, router]);
 
   const handleOptionClick = (option: string) => {
     if (question.multiple) {
@@ -187,15 +224,8 @@ export default function QuizPage() {
     }
 
     if (isLastQuestion) {
-      const profile = createUserProfile(answers);
-
-      sessionStorage.setItem(
-        "match-capilar:user-profile",
-        JSON.stringify(profile),
-      );
-
-      router.push("/resultado");
-
+      setAnalysisStep(0);
+      setIsAnalyzing(true);
       return;
     }
 
@@ -211,7 +241,59 @@ export default function QuizPage() {
   const handleRestart = () => {
     setCurrentQuestion(0);
     setAnswers({});
+    setIsAnalyzing(false);
+    setAnalysisStep(0);
   };
+
+  if (isAnalyzing) {
+    return (
+      <main className="min-h-screen bg-white text-zinc-900">
+        <section className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6 py-12 sm:px-10">
+          <div className="w-full text-center">
+            <div className="relative mx-auto mb-10 flex h-28 w-28 items-center justify-center">
+              <span className="absolute inset-0 animate-ping rounded-full bg-pink-100 opacity-60" />
+              <span className="absolute inset-3 animate-pulse rounded-full bg-pink-50" />
+
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-pink-600 text-2xl text-white shadow-lg shadow-pink-200">
+                ✦
+              </div>
+            </div>
+
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
+              Analisando seu perfil
+            </h1>
+
+            <p className="mx-auto mt-4 max-w-md text-zinc-600">
+              Estamos encontrando os produtos que mais combinam com as
+              necessidades do seu cabelo.
+            </p>
+
+            <div className="mx-auto mt-10 max-w-sm">
+              <div className="mb-3 flex justify-center gap-2">
+                {analysisSteps.map((_, index) => (
+                  <span
+                    key={index}
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      index <= analysisStep
+                        ? "w-8 bg-pink-600"
+                        : "w-2 bg-zinc-200"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <p
+                key={analysisStep}
+                className="animate-pulse text-sm font-medium text-pink-600"
+              >
+                {analysisSteps[analysisStep]}
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white text-zinc-900">
