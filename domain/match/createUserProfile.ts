@@ -7,6 +7,7 @@ import {
   mapHairGoal,
   mapHairPattern,
   mapHeatExposure,
+  mapScentMatters,
   mapWashFrequency,
 } from "./mapAnswers";
 
@@ -23,6 +24,7 @@ export function createUserProfile(
   const washFrequencyAnswer = answers[6]?.[0] ?? "";
   const hairPatternAnswer = answers[7]?.[0] ?? "";
   const budgetAnswer = answers[8]?.[0] ?? "";
+  const scentMattersAnswer = answers[9]?.[0] ?? "";
 
   const hairConditions = [
     mapHairCondition(hairConditionAnswer),
@@ -45,6 +47,7 @@ export function createUserProfile(
     careRoutine: mapCareRoutine(careRoutineAnswer),
     washFrequency: mapWashFrequency(washFrequencyAnswer),
     budget: mapBudget(budgetAnswer),
+    scentMatters: mapScentMatters(scentMattersAnswer),
     recommendationStrategy: hasSpecificNeeds
       ? "necessidades_especificas"
       : "cuidado_amplo",

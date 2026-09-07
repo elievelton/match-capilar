@@ -21,9 +21,10 @@ describe("ProductProfile", () => {
         hairPatterns: ["ondulado", "cacheado"],
       },
       characteristics: {
-        intensity: "media",
-        routineComplexity: "simples",
-      },
+  intensity: "media",
+  routineComplexity: "simples",
+  fragrance: "agradavel",
+},
     };
 
     expect(product.name).toBe("Produto de exemplo");

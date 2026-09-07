@@ -81,5 +81,6 @@ export type UserProfile = {
   careRoutine: CareRoutine;
   washFrequency: WashFrequency;
   budget: Budget;
+  scentMatters: boolean;
   recommendationStrategy: RecommendationStrategy;
 };

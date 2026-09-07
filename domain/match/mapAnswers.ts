@@ -227,3 +227,16 @@ export function mapBudget(answer: string): Budget {
       };
   }
 }
+
+export function mapScentMatters(answer: string): boolean {
+  switch (answer) {
+    case "Sim, gosto de produtos cheirosos":
+      return true;
+
+    case "Não, o cheiro não é importante para mim":
+      return false;
+
+    default:
+      return false;
+  }
+}

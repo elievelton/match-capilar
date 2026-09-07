@@ -45,9 +45,10 @@ export const productCatalog: CatalogProduct[] = [
       },
 
       characteristics: {
-        intensity: "media",
-        routineComplexity: "simples",
-      },
+  intensity: "media",
+  routineComplexity: "simples",
+  fragrance: "agradavel",
+},
     },
 
     offer: {
@@ -98,9 +99,10 @@ export const productCatalog: CatalogProduct[] = [
       },
 
       characteristics: {
-        intensity: "intensa",
-        routineComplexity: "moderada",
-      },
+  intensity: "media",
+  routineComplexity: "simples",
+  fragrance: "agradavel",
+},
     },
 
     offer: {
@@ -153,6 +155,7 @@ export const productCatalog: CatalogProduct[] = [
       characteristics: {
         intensity: "intensa",
         routineComplexity: "moderada",
+        fragrance: "agradavel",
       },
     },
 
@@ -206,6 +209,7 @@ export const productCatalog: CatalogProduct[] = [
       characteristics: {
         intensity: "intensa",
         routineComplexity: "complexa",
+        fragrance: "agradavel",
       },
     },
 
@@ -257,6 +261,7 @@ export const productCatalog: CatalogProduct[] = [
       characteristics: {
         intensity: "media",
         routineComplexity: "simples",
+        fragrance: "neutro",
       },
     },
 

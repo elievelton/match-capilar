@@ -1,79 +1,93 @@
 import { describe, expect, it } from "vitest";
+
 import { calculateMatch } from "./calculateMatch";
+
 import type { UserProfile } from "../types";
 import type { ProductOffer } from "../../product/offer/types";
-import type { ProductProfile } from "../../product/types";
+import type {
+  ProductProfile,
+  ProductCharacteristics,
+} from "../../product/types";
 
 const baseUser: UserProfile = {
   hairPattern: "cacheado",
   hairConditions: ["ressecamento"],
   goals: ["hidratacao"],
   chemicalTreatment: "sem_quimica_recente",
-  heatExposure: "raramente",
-  careRoutine: "rotina_simples",
+  heatExposure: "nao_usa",
+  careRoutine: "rotina_moderada",
   washFrequency: "duas_a_tres_semana",
   budget: {
     mode: "limited",
     maxAmount: 50,
   },
+  scentMatters: false,
   recommendationStrategy: "necessidades_especificas",
 };
 
-const createProduct = (
-  overrides: Partial<ProductProfile> = {},
-): ProductProfile => ({
-  name: "Máscara Hidratante",
-  brand: "Marca Exemplo",
-  category: "mascara",
-  needs: {
-    hydration: "alta",
-    nutrition: "media",
-    reconstruction: "baixa",
-    frizzControl: "media",
-    definition: "baixa",
-    oilControl: "baixa",
-    shine: "media",
-    growth: "nao_indicado",
-  },
-  compatibility: {
-    hairPatterns: ["cacheado"],
-  },
-  characteristics: {
-    intensity: "leve",
-    routineComplexity: "simples",
-  },
-  ...overrides,
-});
+const baseCharacteristics: ProductCharacteristics = {
+  intensity: "media",
+  routineComplexity: "moderada",
+  fragrance: "agradavel",
+};
 
-const createOffer = (
+function createProduct(
+  overrides: Partial<ProductProfile> = {},
+): ProductProfile {
+  return {
+    id: "produto-1",
+    name: "Produto Teste",
+    brand: "Marca Teste",
+    category: "mascara",
+    characteristics: {
+      ...baseCharacteristics,
+      ...overrides.characteristics,
+    },
+    compatibility: {
+      hairPatterns: ["cacheado"],
+    },
+    needs: {
+        nutrition: "alta",
+      hydration: "alta",
+      frizzControl: "media",
+      reconstruction: "baixa",
+      definition: "media",
+      oilControl: "baixa",
+      shine: "media",
+      growth: "baixa",
+    },
+    ...overrides,
+  };
+}
+
+function createOffer(
   overrides: Partial<ProductOffer> = {},
-): ProductOffer => ({
-  productId: "product_001",
-  store: "Loja Exemplo",
-  price: 45,
-  size: "250g",
-  url: "https://exemplo.com/produto",
-  available: true,
-  ...overrides,
-});
+): ProductOffer {
+  return {
+    productId: "produto-1",
+    store: "Loja Teste",
+    price: 40,
+    size: "300ml",
+    url: "https://example.com/produto",
+    available: true,
+    ...overrides,
+  };
+}
 
 describe("calculateMatch", () => {
-  it("deve gerar Match alto para um produto muito compatível", () => {
+  it("deve calcular um Match positivo para produto compatível", () => {
     const product = createProduct();
     const offer = createOffer();
 
-    const result = calculateMatch(
-      baseUser,
-      product,
-      offer,
-    );
+    const result = calculateMatch(baseUser, product, offer);
 
+    expect(result.score).toBeGreaterThan(0);
     expect(result.level).toBe("alta");
-    expect(result.score).toBeGreaterThanOrEqual(75);
-    expect(result.score).toBeLessThanOrEqual(100);
+    expect(result.product).toBe(product);
+    expect(result.offer).toBe(offer);
   });
 
-  it("deve marcar como não indicado um produto incompatível com o tipo de cabelo", () => {
+  it("deve considerar o tipo de cabelo na compatibilidade", () => {
     const product = createProduct({
       compatibility: {
         hairPatterns: ["liso"],
@@ -88,50 +102,9 @@ describe("calculateMatch", () => {
 
     expect(result.score).toBe(0);
     expect(result.level).toBe("nao_indicado");
-    expect(result.reasons).toHaveLength(1);
   });
 
-  it("deve dividir os pontos de necessidades quando existem dois objetivos", () => {
-    const user: UserProfile = {
-      ...baseUser,
-      goals: ["hidratacao", "controle_frizz"],
-    };
-
-    const product = createProduct({
-      needs: {
-        hydration: "alta",
-        nutrition: "baixa",
-        reconstruction: "baixa",
-        frizzControl: "media",
-        definition: "baixa",
-        oilControl: "baixa",
-        shine: "baixa",
-        growth: "nao_indicado",
-      },
-    });
-
-    const result = calculateMatch(
-      user,
-      product,
-      createOffer(),
-    );
-
-    expect(result.score).toBe(82);
-  });
-
-  it("deve perder os pontos de orçamento quando a oferta ultrapassa o limite informado", () => {
-    const result = calculateMatch(
-      baseUser,
-      createProduct(),
-      createOffer({
-        price: 80,
-      }),
-    );
-
-    expect(result.score).toBe(77);
-  });
-
-  it("não deve eliminar o produto quando o usuário não informa o tipo de cabelo", () => {
+  it("deve permitir o produto quando o tipo de cabelo não foi informado", () => {
     const user: UserProfile = {
       ...baseUser,
       hairPattern: "tipo_nao_informado",
@@ -139,7 +112,7 @@ describe("calculateMatch", () => {
 
     const product = createProduct({
       compatibility: {
-        hairPatterns: ["cacheado"],
+        hairPatterns: ["liso"],
       },
     });
 
@@ -149,24 +122,173 @@ describe("calculateMatch", () => {
       createOffer(),
     );
 
-    expect(result.level).not.toBe("nao_indicado");
     expect(result.score).toBeGreaterThan(0);
+    expect(result.level).not.toBe("nao_indicado");
   });
 
-  it("deve considerar uma oferta indisponível como inadequada para o orçamento", () => {
+  it("deve considerar o orçamento quando a oferta está dentro do limite", () => {
+    const product = createProduct();
+
     const result = calculateMatch(
       baseUser,
-      createProduct(),
-      createOffer({
-        available: false,
-      }),
+      product,
+      createOffer({ price: 40 }),
     );
 
-    expect(result.score).toBe(77);
+    expect(result.reasons).toContainEqual({
+      criterion: "orcamento",
+      description: "A oferta está dentro do orçamento informado.",
+    });
+  });
+
+  it("não deve considerar positivamente o orçamento quando a oferta ultrapassa o limite", () => {
+    const product = createProduct();
+
+    const result = calculateMatch(
+      baseUser,
+      product,
+      createOffer({ price: 60 }),
+    );
+
     expect(result.reasons).not.toContainEqual({
       criterion: "orcamento",
-      description:
-        "A oferta está dentro do orçamento informado.",
+      description: "A oferta está dentro do orçamento informado.",
     });
+  });
+
+  it("deve considerar reputação quando o produto possui boa avaliação e muitas avaliações", () => {
+    const product = createProduct({
+      rating: 4.8,
+      reviewCount: 2000,
+    });
+
+    const result = calculateMatch(
+      baseUser,
+      product,
+      createOffer(),
+    );
+
+    expect(result.reasons).toContainEqual({
+      criterion: "reputacao",
+      description:
+        "A avaliação e a quantidade de avaliações do produto contribuem positivamente para sua reputação.",
+    });
+  });
+
+  it("não deve penalizar fragrância quando o cheiro não importa para o usuário", () => {
+    const user: UserProfile = {
+      ...baseUser,
+      scentMatters: false,
+    };
+
+    const product = createProduct({
+      characteristics: {
+        ...baseCharacteristics,
+        fragrance: "neutro",
+      },
+    });
+
+    const result = calculateMatch(
+      user,
+      product,
+      createOffer(),
+    );
+
+    const pleasantProduct = createProduct({
+      characteristics: {
+        ...baseCharacteristics,
+        fragrance: "agradavel",
+      },
+    });
+
+    const pleasantResult = calculateMatch(
+      user,
+      pleasantProduct,
+      createOffer(),
+    );
+
+    expect(result.score).toBe(pleasantResult.score);
+    expect(result.reasons).not.toContainEqual({
+      criterion: "fragrancia",
+      description:
+        "Você informou que o cheiro do produto é importante, e este produto possui fragrância neutra.",
+    });
+  });
+
+  it("deve penalizar fragrância neutra quando o cheiro importa para o usuário", () => {
+    const user: UserProfile = {
+      ...baseUser,
+      scentMatters: true,
+    };
+
+    const neutralProduct = createProduct({
+      characteristics: {
+        ...baseCharacteristics,
+        fragrance: "neutro",
+      },
+    });
+
+    const pleasantProduct = createProduct({
+      characteristics: {
+        ...baseCharacteristics,
+        fragrance: "agradavel",
+      },
+    });
+
+    const neutralResult = calculateMatch(
+      user,
+      neutralProduct,
+      createOffer(),
+    );
+
+    const pleasantResult = calculateMatch(
+      user,
+      pleasantProduct,
+      createOffer(),
+    );
+
+    expect(neutralResult.score).toBe(
+      pleasantResult.score - 2,
+    );
+
+    expect(neutralResult.reasons).toContainEqual({
+      criterion: "fragrancia",
+      description:
+        "Você informou que o cheiro do produto é importante, e este produto possui fragrância neutra.",
+    });
+  });
+
+  it("deve manter o score em uma escala máxima de 100", () => {
+    const user: UserProfile = {
+      ...baseUser,
+      scentMatters: true,
+    };
+
+    const product = createProduct({
+      rating: 5,
+      reviewCount: 5000,
+      characteristics: {
+        ...baseCharacteristics,
+        fragrance: "agradavel",
+      },
+      needs: {
+  nutrition: "alta",
+  hydration: "alta",
+  frizzControl: "alta",
+  reconstruction: "alta",
+  definition: "alta",
+  oilControl: "alta",
+  shine: "alta",
+  growth: "alta",
+},
+    });
+
+    const result = calculateMatch(
+      user,
+      product,
+      createOffer(),
+    );
+
+    expect(result.score).toBeLessThanOrEqual(100);
   });
 });

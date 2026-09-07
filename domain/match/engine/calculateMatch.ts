@@ -316,6 +316,21 @@ function calculateBudgetScore(
   return 0;
 }
 
+function calculateScentScore(
+  userProfile: UserProfile,
+  product: ProductProfile,
+): number {
+  if (!userProfile.scentMatters) {
+    return 0;
+  }
+
+  if (product.characteristics.fragrance === "neutro") {
+    return -2;
+  }
+
+  return 0;
+}
+
 function getMatchLevel(
   score: number,
 ): MatchResult["level"] {
@@ -393,22 +408,28 @@ export function calculateMatch(
     product,
   );
 
+  const scentScore = calculateScentScore(
+    userProfile,
+    product,
+  );
+
   const score = Math.min(
-  100,
-  Number(
-    (
-      30 +
-      needScore +
-      conditionScore +
-      chemicalScore +
-      heatScore +
-      routineScore +
-      intensityScore +
-      budgetScore +
-      reputationScore
-    ).toFixed(1),
-  ),
-);
+    100,
+    Number(
+      (
+        30 +
+        needScore +
+        conditionScore +
+        chemicalScore +
+        heatScore +
+        routineScore +
+        intensityScore +
+        budgetScore +
+        reputationScore +
+        scentScore
+      ).toFixed(1),
+    ),
+  );
 
   const reasons: MatchResult["reasons"] = [
     {
@@ -471,6 +492,14 @@ export function calculateMatch(
       criterion: "reputacao",
       description:
         "A avaliação e a quantidade de avaliações do produto contribuem positivamente para sua reputação.",
+    });
+  }
+
+  if (scentScore < 0) {
+    reasons.push({
+      criterion: "fragrancia",
+      description:
+        "Você informou que o cheiro do produto é importante, e este produto possui fragrância neutra.",
     });
   }
 

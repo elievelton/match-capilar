@@ -23,6 +23,7 @@ export type HairPattern =
 
 export type ProductIntensity = "leve" | "media" | "intensa";
 export type RoutineComplexity = "simples" | "moderada" | "complexa";
+export type ProductFragrance = "agradavel" | "neutro";
 
 export type ProductNeeds = {
   hydration: MatchLevel;
@@ -42,6 +43,7 @@ export type ProductCompatibility = {
 export type ProductCharacteristics = {
   intensity: ProductIntensity;
   routineComplexity: RoutineComplexity;
+  fragrance: ProductFragrance;
 };
 
 export type ProductProfile = {

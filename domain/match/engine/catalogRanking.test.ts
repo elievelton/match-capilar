@@ -19,6 +19,7 @@ describe("Ranking do catálogo real", () => {
         maxAmount: 50,
       },
       recommendationStrategy: "necessidades_especificas",
+      scentMatters: false,
     };
 
     const results = productCatalog.map(({ product, offer }) =>

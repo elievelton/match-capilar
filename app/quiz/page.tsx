@@ -109,20 +109,28 @@ const questions: Question[] = [
     ],
   },
   {
-  id: 8,
-  title: "Quanto você pretende gastar em um produto para o seu cabelo?",
-  description:
-    "Isso nos ajuda a encontrar opções que façam sentido para você.",
-  options: [
-    "Até R$ 30",
-    "R$ 31 a R$ 50",
-    "R$ 51 a R$ 80",
-    "R$ 81 a R$ 120",
-    "R$ 121 a R$ 200",
-    "Mais de R$ 200",
-    "Não quero informar",
-  ],
-},
+    id: 8,
+    title: "Quanto você pretende gastar em um produto para o seu cabelo?",
+    description:
+      "Isso nos ajuda a encontrar opções que façam sentido para você.",
+    options: [
+      "Até R$ 30",
+      "R$ 31 a R$ 50",
+      "R$ 51 a R$ 80",
+      "R$ 81 a R$ 120",
+      "R$ 121 a R$ 200",
+      "Não quero limitar pelo preço",
+      "Prefiro não informar",
+    ],
+  },
+  {
+    id: 9,
+    title: "O cheiro do produto importa para você?",
+    options: [
+      "Sim, gosto de produtos cheirosos",
+      "Não, o cheiro não é importante para mim",
+    ],
+  },
 ];
 
 export default function QuizPage() {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import {
   mapBudget,
   mapCareRoutine,
@@ -7,12 +8,12 @@ import {
   mapHairGoal,
   mapHairPattern,
   mapHeatExposure,
+  mapScentMatters,
   mapWashFrequency,
 } from "./mapAnswers";
-import {
-  createUserProfile,
-  type QuizAnswers,
-} from "./createUserProfile";
+
+import { createUserProfile } from "./createUserProfile";
+import type { QuizAnswers } from "./createUserProfile";
 
 describe("mapHairCondition", () => {
   it("deve mapear cabelo ressecado para ressecamento", () => {
@@ -164,6 +165,26 @@ describe("mapBudget", () => {
   });
 });
 
+describe("mapScentMatters", () => {
+  it("deve considerar o cheiro importante quando o usuário gosta de produtos cheirosos", () => {
+    expect(
+      mapScentMatters("Sim, gosto de produtos cheirosos"),
+    ).toBe(true);
+  });
+
+  it("deve considerar o cheiro não importante quando o usuário não se importa com fragrância", () => {
+    expect(
+      mapScentMatters(
+        "Não, o cheiro não é importante para mim",
+      ),
+    ).toBe(false);
+  });
+
+  it("deve considerar o cheiro não importante para resposta desconhecida", () => {
+    expect(mapScentMatters("Resposta inexistente")).toBe(false);
+  });
+});
+
 describe("createUserProfile", () => {
   it("deve criar um perfil completo com necessidades específicas", () => {
     const answers: QuizAnswers = {
@@ -177,6 +198,7 @@ describe("createUserProfile", () => {
       6: ["2 a 3 vezes por semana"],
       7: ["Cacheado"],
       8: ["R$ 51 a R$ 80"],
+      9: ["Sim, gosto de produtos cheirosos"],
     };
 
     expect(createUserProfile(answers)).toEqual({
@@ -191,6 +213,7 @@ describe("createUserProfile", () => {
         mode: "limited",
         maxAmount: 80,
       },
+      scentMatters: true,
       recommendationStrategy: "necessidades_especificas",
     });
   });
@@ -205,6 +228,7 @@ describe("createUserProfile", () => {
       6: ["Varia bastante"],
       7: ["Cacheado"],
       8: ["Prefiro não informar"],
+      9: ["Não, o cheiro não é importante para mim"],
     };
 
     expect(createUserProfile(answers)).toEqual({
@@ -218,6 +242,7 @@ describe("createUserProfile", () => {
       budget: {
         mode: "not_informed",
       },
+      scentMatters: false,
       recommendationStrategy: "cuidado_amplo",
     });
   });
@@ -228,6 +253,7 @@ describe("createUserProfile", () => {
       2: ["Frizz", "Definição"],
       7: ["Ondulado"],
       8: ["Até R$ 30"],
+      9: ["Não, o cheiro não é importante para mim"],
     };
 
     const profile = createUserProfile(answers);
@@ -245,6 +271,8 @@ describe("createUserProfile", () => {
       mode: "limited",
       maxAmount: 30,
     });
+
+    expect(profile.scentMatters).toBe(false);
 
     expect(profile.recommendationStrategy).toBe(
       "necessidades_especificas",
